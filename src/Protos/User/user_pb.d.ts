@@ -101,6 +101,11 @@ export class AuthUserResponse extends jspb.Message {
     getMessage(): string;
     setMessage(value: string): AuthUserResponse;
 
+    hasAccessToken(): boolean;
+    clearAccessToken(): void;
+    getAccessToken(): string | undefined;
+    setAccessToken(value: string): AuthUserResponse;
+
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): AuthUserResponse.AsObject;
     static toObject(includeInstance: boolean, msg: AuthUserResponse): AuthUserResponse.AsObject;
@@ -115,5 +120,6 @@ export namespace AuthUserResponse {
     export type AsObject = {
         status: boolean,
         message: string,
+        accessToken?: string,
     }
 }

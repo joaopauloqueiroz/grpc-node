@@ -1,5 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { sendUnaryData, ServerUnaryCall } from "grpc";
+import {
+  ERROR_ON_CREATE_USER,
+  USER_AUTHENTICATED,
+  USER_NOT_AUTHENTICATED,
+  USER_NOT_FOUND,
+} from "../Config/consts";
 import AuthService from "../plugins/auth";
 import { IUserServiceServer } from "../Protos/User/user_grpc_pb";
 import {
@@ -32,7 +38,14 @@ export default class UserService implements IUserServiceServer {
         return callback(null, userCreated);
       })
       .catch((error) => {
-        throw error;
+        return callback(
+          {
+            message: ERROR_ON_CREATE_USER,
+            code: error.statusCode,
+            name: error.message,
+          },
+          null
+        );
       });
   }
 
@@ -40,22 +53,48 @@ export default class UserService implements IUserServiceServer {
     call: ServerUnaryCall<AuthUserRequest>,
     callback: sendUnaryData<AuthUserResponse>
   ): Promise<void> {
-    const { email, password } = call.request.toObject();
-    const user = await this.prismaClient.user.findFirst({ where: { email } });
-    if (user) {
-      const isAuthenticated = await this.authService.validatePassword(
-        password,
-        user.password as string
-      );
+    try {
+      const { email, password } = call.request.toObject();
+      const user = await this.prismaClient.user.findFirst({ where: { email } });
+      if (user) {
+        const isAuthenticated = await this.authService.validatePassword(
+          password,
+          user.password as string
+        );
 
-      const userAuth = new AuthUserResponse();
-      userAuth.setStatus(isAuthenticated);
-      userAuth.setMessage(
-        isAuthenticated
-          ? "Usuario autenticado com sucesso"
-          : "Email ou senha inválidos"
+        const userAuth = new AuthUserResponse();
+        userAuth.setStatus(isAuthenticated);
+        if (!isAuthenticated) {
+          userAuth.setMessage(USER_NOT_AUTHENTICATED);
+          return callback(
+            {
+              message: USER_NOT_AUTHENTICATED,
+              code: 401,
+              name: "Error on auth user",
+            },
+            userAuth
+          );
+        }
+        const accessToken = await this.authService.generateToken(user);
+        userAuth.setMessage(USER_AUTHENTICATED);
+        userAuth.setAccessToken(accessToken);
+        console.log(userAuth.toObject());
+        return callback(null, userAuth);
+      } else {
+        return callback(
+          { message: USER_NOT_FOUND, code: 400, name: "User error" },
+          null
+        );
+      }
+    } catch (error) {
+      callback(
+        {
+          message: error.message,
+          code: error.statusCode,
+          name: "User error",
+        },
+        null
       );
-      callback(null, userAuth);
     }
   }
 }

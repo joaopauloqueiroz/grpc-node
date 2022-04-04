@@ -769,7 +769,8 @@ proto.userservice.AuthUserResponse.prototype.toObject = function(opt_includeInst
 proto.userservice.AuthUserResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     status: jspb.Message.getBooleanFieldWithDefault(msg, 1, false),
-    message: jspb.Message.getFieldWithDefault(msg, 2, "")
+    message: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    accessToken: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
   if (includeInstance) {
@@ -814,6 +815,10 @@ proto.userservice.AuthUserResponse.deserializeBinaryFromReader = function(msg, r
       var value = /** @type {string} */ (reader.readString());
       msg.setMessage(value);
       break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAccessToken(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -857,6 +862,13 @@ proto.userservice.AuthUserResponse.serializeBinaryToWriter = function(message, w
       f
     );
   }
+  f = /** @type {string} */ (jspb.Message.getField(message, 3));
+  if (f != null) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
 };
 
 
@@ -893,6 +905,42 @@ proto.userservice.AuthUserResponse.prototype.getMessage = function() {
  */
 proto.userservice.AuthUserResponse.prototype.setMessage = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string access_token = 3;
+ * @return {string}
+ */
+proto.userservice.AuthUserResponse.prototype.getAccessToken = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.userservice.AuthUserResponse} returns this
+ */
+proto.userservice.AuthUserResponse.prototype.setAccessToken = function(value) {
+  return jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * Clears the field making it undefined.
+ * @return {!proto.userservice.AuthUserResponse} returns this
+ */
+proto.userservice.AuthUserResponse.prototype.clearAccessToken = function() {
+  return jspb.Message.setField(this, 3, undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.userservice.AuthUserResponse.prototype.hasAccessToken = function() {
+  return jspb.Message.getField(this, 3) != null;
 };
 
 

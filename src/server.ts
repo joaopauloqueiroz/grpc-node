@@ -1,6 +1,5 @@
 import "dotenv/config";
 import grpc from "grpc";
-import "reflect-metadata";
 import {
   IUserServiceServer,
   UserServiceService,
@@ -15,6 +14,6 @@ server.bindAsync(
   grpc.ServerCredentials.createInsecure(),
   (error, port) => {
     server.start();
-    console.log(`Server is runing => localhost:${process.env.APP_PORT}`);
+    console.log(`Server is runing => 0.0.0.0:${process.env.APP_PORT}`);
   }
 );
